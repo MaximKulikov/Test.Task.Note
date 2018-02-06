@@ -1,0 +1,43 @@
+.roundButton {
+    -fx-background-color: yellow;
+    -fx-background-radius: 5em;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+}
+
+.button_minimize {
+
+    -fx-background-image: url("/images/minimize.png");
+    -fx-border: none;
+    -fx-background-repeat: stretch;
+    -fx-background-position: center center;
+}
+
+.button_minimize:hover {
+    -fx-background-image: url("/images/minimize-active.png");
+    -fx-border: none;
+    -fx-background-repeat: stretch;
+    -fx-background-position: center center;
+}
+
+.button_close {
+
+    -fx-background-image: url("/images/close.png");
+    -fx-border: none;
+    -fx-background-repeat: stretch;
+    -fx-background-position: center center;
+}
+
+.button_close:hover {
+    -fx-background-image: url("/images/close-active.png");
+    -fx-border: none;
+    -fx-background-repeat: stretch;
+    -fx-background-position: center center;
+}
+
+.window_border {
+    -fx-border-width: 1px;
+    -fx-border-color: #212121;
+}
