@@ -6,6 +6,10 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTimePicker;
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -36,44 +40,51 @@ public class NewNote {
     @FXML
     public Label count;
 
+    private ReadOnlyIntegerProperty countProperty;
+    private BooleanProperty buttonDisableState = new SimpleBooleanProperty(false);
+
+
+
     /**
      * Оборачиваем оповещение о результате добавления заметки в базу данных в потом JavaFX
      *
      * @param text
      * @param color
      */
-    private void addNoteToDBResultDescriptionFromCommonThread(String text, String color) {
+    private void addNoteWithDBResultDescriptionFromCommonThread(String text, String color) {
         Platform.runLater(() -> textWarningOn(text, color));
     }
 
     /**
      * Клик по кнопке добавления новой заметки
+     *
      * @param actionEvent
      */
     @FXML
     public void buttonAddNote_OnClick(ActionEvent actionEvent) {
 
-        buttonAddNote.setDisable(true);
+        buttonDisableState.setValue(true);
+        System.out.println(buttonAddNote.disableProperty().toString());
 
         boolean error = false;
         LocalDate date = datePicker.getValue();
 
         if (date == null) {
             error = true;
-            textWarningOn("Дата не выбрана","red");
+            textWarningOn("Дата не выбрана", "red");
         }
 
         LocalTime time = timePicker.getValue();
 
         if (time == null) {
             error = true;
-            textWarningOn("Время не выбрано","red");
+            textWarningOn("Время не выбрано", "red");
         }
         String text = notePicker.getText();
 
         if (text.length() == 0) {
             error = true;
-            textWarningOn("Заметка не может быть пустой!","red");
+            textWarningOn("Заметка не может быть пустой!", "red");
 
         }
 
@@ -92,9 +103,6 @@ public class NewNote {
                 });
             }
             ).start();
-
-
-            buttonAddNote.setDisable(false);
 
         } else {
 
@@ -120,17 +128,17 @@ public class NewNote {
 
                 switch (db.addNote(note)) {
                     case 0:
-                        addNoteToDBResultDescriptionFromCommonThread("Произошла непредвиденная ошибка", "red");
-                        buttonAddNote.setDisable(false);
+                        addNoteWithDBResultDescriptionFromCommonThread("Произошла непредвиденная ошибка", "red");
+                        buttonDisableState.setValue(false);
                         break;
                     case 1:
-                        addNoteToDBResultDescriptionFromCommonThread("Заметка добавлена", "green");
+                        addNoteWithDBResultDescriptionFromCommonThread("Заметка добавлена", "green");
                         Notes.addObservableNote(note);
-                        closeWindowIn(3000);
+                        closeWindowIn(2500);
                         break;
                     case 2:
-                        addNoteToDBResultDescriptionFromCommonThread("Заметка не добавлена","red");
-                        buttonAddNote.setDisable(false);
+                        addNoteWithDBResultDescriptionFromCommonThread("Заметка не добавлена", "red");
+                        buttonDisableState.setValue(false);
                         break;
                 }
 
@@ -148,13 +156,15 @@ public class NewNote {
     }
 
     private void closeWindowIn(int i) {
+        try {
+            Thread.sleep(i);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Platform.runLater(() -> {
-            try {
-                Thread.sleep(i);
-                labelWarning.getScene().getWindow().hide();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            labelWarning.getScene().getWindow().hide();
+
         });
     }
 
@@ -164,8 +174,15 @@ public class NewNote {
         datePicker.setValue(LocalDate.now());
         timePicker.setValue(LocalTime.now());
 
+        countProperty= notePicker.lengthProperty();
+        count.textProperty().bind(countProperty.asString());
+
+        BooleanBinding buttonState = countProperty.greaterThan(100).or(buttonDisableState);
+
+        buttonAddNote.disableProperty().bind(buttonState);
+
+
         notePicker.textProperty().addListener((observable, oldValue, newValue) -> {
-            count.setText(String.valueOf(newValue.length()));
             if (newValue.length() > 100) {
                 textWarningOn("Текст превышает 100 символов", "red");
             } else {
@@ -176,13 +193,13 @@ public class NewNote {
     }
 
     private void textWarningOff() {
-        buttonAddNote.setDisable(false);
+        //buttonAddNote.setDisable(false);
         labelWarning.setStyle(null);
         labelWarning.setText("");
     }
 
     private void textWarningOn(String text, String color) {
-        buttonAddNote.setDisable(true);
+        //buttonAddNote.setDisable(true);
         labelWarning.setText(text);
         labelWarning.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white");
     }

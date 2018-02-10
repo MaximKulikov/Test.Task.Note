@@ -96,7 +96,10 @@ public class SQLiteNoteDAO implements NoteDAO {
 
         if (!db.exists()) {
             try {
-                db.createNewFile();
+                boolean created = db.createNewFile();
+
+                if (!created) throw new IOException("Файл с базой не создан");
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
