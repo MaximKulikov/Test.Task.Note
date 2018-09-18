@@ -2,6 +2,7 @@ package ru.maximkulikov.testtasknotes.controllers;
 
 import java.io.IOException;
 import java.util.List;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,7 +23,7 @@ import ru.maximkulikov.testtasknotes.Configuration;
 import ru.maximkulikov.testtasknotes.Main;
 import ru.maximkulikov.testtasknotes.Notes;
 import ru.maximkulikov.testtasknotes.database.DBFactory;
-import ru.maximkulikov.testtasknotes.database.dao.NoteDAO;
+import ru.maximkulikov.testtasknotes.database.Databases;
 import ru.maximkulikov.testtasknotes.database.model.Note;
 
 /**
@@ -80,6 +81,7 @@ public class ListNote {
 
     /**
      * Закрытие окна с сохранением кординат
+     *
      * @param event
      */
     @FXML
@@ -104,7 +106,7 @@ public class ListNote {
 
         tableNote.setItems(Notes.getNoteObservableList());
 
-        new Thread(() -> loadDataFromDB()).start();
+        new Thread(this::loadDataFromDB).start();
 
     }
 
@@ -113,7 +115,7 @@ public class ListNote {
      */
     private void loadDataFromDB() {
 
-        NoteDAO db = DBFactory.getDB("sqlite");
+        Databases db = DBFactory.getDB(Configuration.getDB());
 
         List<Note> noteList = db.selectAllNotes();
         if (noteList != null) {

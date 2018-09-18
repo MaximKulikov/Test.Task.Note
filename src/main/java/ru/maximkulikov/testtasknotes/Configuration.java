@@ -21,14 +21,15 @@ public class Configuration {
         try {
             File file = new File("config.properties");
             file.createNewFile();
-//          logger.info("File created: {}", isfilecreated);
+//          log.info("File created: {}", isfilecreated);
+
 
             try (InputStreamReader input = new InputStreamReader(new FileInputStream(file), "UTF-8")) {
                 config.load(input);
             }
 
         } catch (IOException ex) {
-//          logger.error(ex.getLocalizedMessage());
+//          log.error(ex.getLocalizedMessage());
             return false;
         }
         return true;
@@ -61,14 +62,11 @@ public class Configuration {
     public static String getDB() {
 
         return config.getProperty(Param.DB_TYPE.toString(), "sqlite");
-
     }
 
     public static enum Param {
-
         WINDOW_LIST_X,
         WINDOW_LIST_Y,
         DB_TYPE
-
     }
 }

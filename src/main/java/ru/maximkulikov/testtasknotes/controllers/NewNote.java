@@ -2,6 +2,7 @@ package ru.maximkulikov.testtasknotes.controllers;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTimePicker;
@@ -18,7 +19,7 @@ import javafx.scene.control.TextField;
 import ru.maximkulikov.testtasknotes.Configuration;
 import ru.maximkulikov.testtasknotes.Notes;
 import ru.maximkulikov.testtasknotes.database.DBFactory;
-import ru.maximkulikov.testtasknotes.database.dao.NoteDAO;
+import ru.maximkulikov.testtasknotes.database.Databases;
 import ru.maximkulikov.testtasknotes.database.model.Note;
 
 /**
@@ -64,7 +65,6 @@ public class NewNote {
     public void buttonAddNote_OnClick(ActionEvent actionEvent) {
 
         buttonDisableState.setValue(true);
-        System.out.println(buttonAddNote.disableProperty().toString());
 
         boolean error = false;
         LocalDate date = datePicker.getValue();
@@ -106,7 +106,7 @@ public class NewNote {
 
         } else {
 
-            NoteDAO db = DBFactory.getDB(Configuration.getDB());
+            Databases db = DBFactory.getDB(Configuration.getDB());
 
             if (db == null) {
                 labelWarning.setText("Ошибка подключения к базе, проверьте файл конфигурации");
@@ -145,6 +145,7 @@ public class NewNote {
             }).start();
 
         }
+        buttonDisableState.setValue(false);
 
     }
 

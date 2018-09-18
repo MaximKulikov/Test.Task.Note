@@ -2,7 +2,7 @@ package ru.maximkulikov.testtasknotes.database;
 
 import java.util.HashMap;
 import java.util.Map;
-import ru.maximkulikov.testtasknotes.database.dao.NoteDAO;
+
 import ru.maximkulikov.testtasknotes.database.dao.impl.SQLiteNoteDAO;
 
 /**
@@ -12,18 +12,20 @@ import ru.maximkulikov.testtasknotes.database.dao.impl.SQLiteNoteDAO;
 public class DBFactory {
 
     //Фабрика Баз Данных
-    private static Map<String, NoteDAO> mapFactory = new HashMap();
+    private static Map<String, Databases> mapFactory = new HashMap();
 
     //Метка для проверки необходимости инициализировать базу
-    private static Map<String,Boolean> init = new HashMap<>();
+    private static Map<String, Boolean> init = new HashMap<>();
 
     static {
 
         mapFactory.put("sqlite", new SQLiteNoteDAO());
+        mapFactory.put("derby", new LiquibaseImp());
         init.put("sqlite", true);
+        init.put("derby", true);
     }
 
-    public static NoteDAO getDB(String dbType) {
+    public static Databases getDB(String dbType) {
 
         /**
          * Инициализируем базу, если необходимо
@@ -31,10 +33,9 @@ public class DBFactory {
         Boolean requreInit = init.get(dbType);
         if (requreInit != null && requreInit) {
             mapFactory.get(dbType).init();
-            init.put(dbType,false);
+            init.put(dbType, false);
         }
 
         return mapFactory.get(dbType);
     }
-
 }
